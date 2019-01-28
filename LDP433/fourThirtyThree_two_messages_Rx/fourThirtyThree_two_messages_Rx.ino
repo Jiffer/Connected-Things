@@ -17,6 +17,7 @@
 RH_ASK rf_driver;
 
 String str_out;
+int ledPin = 3;
 
 void setup()
 {
@@ -25,6 +26,8 @@ void setup()
   // Setup Serial Monitor
   Serial.begin(9600);
   Serial.println("waiting for received data of size 11 chars...");
+
+  pinMode(ledPin, OUTPUT);
 }
 
 void loop()
@@ -59,7 +62,13 @@ void loop()
     // check for specific characters
 
     if(str_out.substring(0,4) == "msg1") {
-      Serial.println("toggle LED");
+      Serial.println("msg1");
+      digitalWrite(ledPin, HIGH);
+      
+    }
+    if(str_out.substring(0,4) == "msg2") {
+      Serial.println("got msg2");
+      digitalWrite(ledPin, LOW);
       
     }
   }

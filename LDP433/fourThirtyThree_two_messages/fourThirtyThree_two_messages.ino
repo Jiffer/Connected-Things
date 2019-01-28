@@ -24,13 +24,13 @@ void setup()
 void loop()
 {
   // a string is just a bunch of characters
-    char *msg = "Hello World";
-    rf_driver.send((uint8_t *)msg, strlen(msg));
-    rf_driver.waitPacketSent();
-    delay(1000);
-
     char *msg1 = "msg1";
-    rf_driver.send((uint8_t *)msg2, strlen(msg1));
+    rf_driver.send((uint8_t *)msg1, strlen(msg1));
+    rf_driver.waitPacketSent();
+    delay(500);
+
+    char *msg2 = "msg2";
+    rf_driver.send((uint8_t *)msg2, strlen(msg2));
     rf_driver.waitPacketSent();
     delay(500);
 
