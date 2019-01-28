@@ -29,8 +29,8 @@ void loop()
     rf_driver.waitPacketSent();
     delay(1000);
 
-    char *msg2 = "Hilo";
-    rf_driver.send((uint8_t *)msg2, strlen(msg2));
+    char *msg1 = "msg1";
+    rf_driver.send((uint8_t *)msg2, strlen(msg1));
     rf_driver.waitPacketSent();
     delay(500);
 

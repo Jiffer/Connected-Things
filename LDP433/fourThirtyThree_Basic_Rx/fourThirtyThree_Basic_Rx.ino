@@ -35,10 +35,14 @@ void loop()
   // Check if there is a received packet and if it is expected size
   if (rf_driver.recv(buf, &buflen))
   {
+    //    Serial.print("len: " );
+    //    Serial.println(buflen);
+
 
     // Message received with valid checksum
     Serial.print("Message Received: ");
     Serial.println((char*)buf);
+
   }
 
 }

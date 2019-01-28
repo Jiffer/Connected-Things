@@ -71,7 +71,8 @@ void loop()
   }
 
   str_digitalIn = String(digitalIn);
-  // Combine Humidity and Temperature
+  
+  // Combine analog and digital sensors into one string (payload)
   str_out = str_analogIn + "," + str_digitalIn;
 
   // Compose output character
