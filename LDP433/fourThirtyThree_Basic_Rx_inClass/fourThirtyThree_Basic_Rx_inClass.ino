@@ -27,7 +27,7 @@ void setup()
 void loop()
 {
   // Set buffer to size of expected message
-  uint8_t buf[11];
+  uint8_t buf[4];
 
   uint8_t buflen = sizeof(buf);
 
@@ -41,6 +41,16 @@ void loop()
     // Message received with valid checksum
     Serial.print("Message Received: ");
     Serial.println((char*)buf);
+
+    String str_out = String((char*)buf);
+
+    if(str_out.substring(0,4) == "msg1"){
+      Serial.println("got msg1");
+    }
+
+    if(str_out.substring(0,4) == "msg2"){
+      Serial.println("got msg2");
+    }
 
   }
 

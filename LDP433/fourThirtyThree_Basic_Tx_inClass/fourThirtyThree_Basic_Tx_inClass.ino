@@ -15,6 +15,9 @@ adapted from:
 // Create Amplitude Shift Keying Object
 RH_ASK rf_driver;
 
+int analogIn = A0;
+int digitalIn = 2;
+
 void setup()
 {
     // Initialize ASK Object
@@ -24,9 +27,14 @@ void setup()
 void loop()
 {
   // a string is just a bunch of characters
-    char *msg = "Hello World";
-    rf_driver.send((uint8_t *)msg, strlen(msg));
+    char *msg1 = "msg1";
+    rf_driver.send((uint8_t *)msg1, strlen(msg1));
     rf_driver.waitPacketSent();
     delay(1000);
-
+    
+    // message 2
+    char *msg2 = "msg2";
+    rf_driver.send((uint8_t *)msg2, strlen(msg2));
+    rf_driver.waitPacketSent();
+    delay(1000);
 }
