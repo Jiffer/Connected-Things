@@ -29,7 +29,7 @@ void setup() {
   radio.setDataRate(RF24_2MBPS);
   pinMode(button1, INPUT_PULLUP);
   pinMode(button2, INPUT_PULLUP);
-
+  pinMode(led, OUTPUT);
   Serial.begin(9600);
 }
 void loop() {
@@ -45,5 +45,8 @@ void loop() {
     RF24NetworkHeader header2(node01);   // (Address where the data is going)
     bool ok2 = network.write(header2, &buttonVal2, sizeof(buttonVal2)); // Send the data
   }
+
+  // add receiving code here
+  // to set brightness (analogWrite value) of led output
 
 }
