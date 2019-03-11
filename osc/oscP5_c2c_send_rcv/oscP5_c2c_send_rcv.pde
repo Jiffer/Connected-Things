@@ -1,5 +1,5 @@
 /**
- * oscP5parsing by andreas schlegel
+ * oscP5parsing by andreas schlegel - modified by Jiffer Harriman
  * example shows how to parse incoming osc messages "by hand".
  * it is recommended to take a look at oscP5plug for an
  * alternative and more convenient way to parse messages.
@@ -27,7 +27,7 @@ void setup() {
    * and the port of the remote location address are the same, hence you will
    * send messages back to this sketch.
    */
-  myRemoteLocation = new NetAddress("10.0.1.3" ,8888);
+  myRemoteLocation = new NetAddress("127.0.0.1" ,8888);
 }
 
 void draw() {
