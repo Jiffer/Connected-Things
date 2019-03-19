@@ -3,15 +3,15 @@
 #include <ArduinoJson.h>
 
 // WiFi Parameters
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
+const char* ssid = "theHarrimans";
+const char* password = "andSadie2";
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
  
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(10000);
     Serial.println("Connecting...");
   }
 }
