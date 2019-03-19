@@ -1,15 +1,12 @@
 //
-// wifiUDP_Tx
+// wifiUDP_Rx
 //
 // Jiffer Hariman
 // Connected Things 2019
 //
 // UDP transmit and receive example.
 //
-// Tx sends a counter that increments from 0-16 and starts over
-// When digital input GPIO5 (nodeMCU pin labelled D1) it sends a one time string message
-//
-// Rx prints values to console and blinks light on and off with even/odd numbers receieved
+// parses comma delimited string message
 //
 // The static IP address of this device needs to be unique (relative to others on the network)
 // The remoteIP address list includes other devices that the UDP messages will be sent to.
@@ -18,10 +15,10 @@
 #include <WiFiUDP.h>
 
 // WiFi variables
-const char* ssid = "netw"; // ssid
-const char* password = "pwd";// password
+const char* ssid = "things"; // ssid
+const char* password = "connected";// password
 boolean wifiConnected = false;
-IPAddress ip(10, 0, 1, 5);
+IPAddress ip(10, 0, 0, 101);
 IPAddress gateway(10, 0, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
 
@@ -31,19 +28,21 @@ WiFiUDP UDP;
 boolean udpConnected = false;
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
 
-// built in LED pin (nodeMCU)
+// drum machine Variables
 #define ledPin 16
 
-// *************************
-// init
-// *************************
+// Output strings
+String str_analogVal;
+String str_digitalVal;
+String str_out;
+
 void setup()
 {
   Serial.begin(115200);
   Serial.println();
 
   // connect to wifi
-  // Initialize wifi connection
+  // Initialise wifi connection
   wifiConnected = connectWifi();
 
   // only proceed if wifi connection successful
@@ -66,9 +65,6 @@ void setup()
   }
 }
 
-// *************************
-// main
-// *************************
 void loop() {
   // check if the WiFi and UDP connections were successful
   if (wifiConnected) {
@@ -97,24 +93,28 @@ void loop() {
         // read the packet into packetBufffer
         UDP.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
 
-        // this code assumes the value coming in is a 16 bit integer
-        int receivedValue = packetBuffer[0] * 256 + packetBuffer[1];
-        Serial.print("got message: ");
-        Serial.println(String((char *)packetBuffer));
+        // Convert received data into string
+        str_out = String((char*)packetBuffer);
 
-        // check if in range
-        if (receivedValue >= 0 && receivedValue < 1023) {
-          // do something about it!
-          digitalWrite(ledPin, receivedValue%2);
+        // Split string into two values
+        for (int i = 0; i < str_out.length(); i++) {
+          if (str_out.substring(i, i + 1) == ",") {
+            str_analogVal = str_out.substring(0, i);
+            str_digitalVal = str_out.substring(i + 1);
+
+            Serial.print("analog: ");
+            Serial.println((str_analogVal.toInt()));
+            Serial.print("dig it: ");
+            Serial.println((str_digitalVal.toInt()));
+            break;
+          }
         }
       }
     }
   }
 }
 
-// *************************
 // connect to UDP – returns true if successful or false if not
-// *************************
 boolean connectUDP() {
   boolean state = false;
 
@@ -131,16 +131,15 @@ boolean connectUDP() {
   return state;
 }
 
-// *************************
 // connect to wifi – returns true if successful or false if not
-// *************************
 boolean connectWifi() {
   boolean state = true;
   int i = 0;
   WiFi.begin(ssid, password);
   WiFi.config(ip, gateway, subnet);
   Serial.println("");
-  
+  Serial.println("Connecting to WiFi");
+
   // Wait for connection
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
