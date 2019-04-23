@@ -1,8 +1,11 @@
+#ifdef ESP8266
 #include <ESP8266WiFi.h>
+#else
+#include <WiFi.h>
+#endif
 
-
-const char* ssid = "networkName";
-const char* password = "password";
+const char* ssid = "anotherThing";
+const char* password = "connected";
 
 // web page to connect to and print:
 const char* host = "www.example.com";
@@ -20,6 +23,8 @@ void setup()
     Serial.print(".");
   }
   Serial.println(" connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
 // *****************

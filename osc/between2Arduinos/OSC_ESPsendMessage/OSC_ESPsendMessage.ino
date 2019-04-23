@@ -16,13 +16,13 @@
 #include <WiFiUdp.h>
 #include <OSCMessage.h>
 
-char ssid[] = "things";          // your network SSID (name)
+char ssid[] = "anotherThing";          // your network SSID (name)
 char password[] = "connected";                    // your network password
 
 WiFiUDP Udp;                                // A UDP instance to let us send and receive packets over UDP
-const IPAddress outIp(10, 0, 0, 101);     // remote IP of your computer
+const IPAddress outIp(10, 0, 1, 9);     // remote IP of your computer
 // use to request a static IP
-IPAddress ip(10, 0, 0, 100); // my IP address (requested)
+IPAddress ip(10, 0, 1, 10); // my IP address (requested)
 IPAddress gateway(10, 0, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
 const unsigned int outPort = 9999;          // remote port to receive OSC

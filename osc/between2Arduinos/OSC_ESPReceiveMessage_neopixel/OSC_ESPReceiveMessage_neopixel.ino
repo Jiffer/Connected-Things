@@ -18,6 +18,16 @@
 #include <OSCBundle.h>
 #include <OSCData.h>
 
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
+#define NEO_PIN            25
+// How many NeoPixels are attached to the Arduino?
+#define NUMPIXELS      10
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
+
 
 char ssid[] = "anotherThing";          // your network SSID (name)
 char password[] = "connected";                    // your network password
@@ -54,7 +64,7 @@ void setup() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-  
+
 
   int i = 0;
   int state = true;
@@ -88,18 +98,33 @@ void setup() {
 #else
   Serial.println(Udp.localPort());
 #endif
-
+  // initialize the neopixel library
+  pixels.begin();
 }
 
-
-//void led(OSCMessage &msg) {
-//  ledState = msg.getInt(0);
-//  digitalWrite(BUILTIN_LED, ledState);
-//  Serial.print("/led: ");
-//  Serial.println(ledState);
-//}
 void led(OSCMessage &msg) {
   ledState = msg.getInt(0);
+  if (ledState == 1) {
+    // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
+    for (int i = 0; i < NUMPIXELS; i++) {
+
+      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+      pixels.setPixelColor(i, pixels.Color(255, 255, 255));
+
+    }
+    pixels.show();
+  }else{
+    // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
+  for (int i = 0; i < NUMPIXELS; i++) {
+
+    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
+
+  }
+  pixels.show();
+  }
+  
+  // also blink the on board LED
   digitalWrite(2, ledState); // GPIO 2 is built in LED on DOIT ESP32 board
   Serial.print("/led: ");
   Serial.println(ledState);
@@ -109,7 +134,7 @@ void led(OSCMessage &msg) {
 void test(OSCMessage &msg) {
   char * blah;
   // here blah can hold up to 100 characters
-  blah = new char[100]; 
+  blah = new char[100];
   Serial.print("/test: ");
   msg.getString(0, blah);
   Serial.println(blah);
@@ -126,19 +151,19 @@ void loop() {
   int size = Udp.parsePacket();
 
   if (size > 0) {
-    Serial.print("got stuff");
+    //    Serial.print("stuff");
     while (size--) {
       msg.fill(Udp.read());
     }
-    if (!msg.hasError()) 
+    if (!msg.hasError())
     {
       // all possible OSC messages and handler functions
       msg.dispatch("/led", led);
       msg.dispatch("/test", test);
       msg.dispatch("/analog", gotAnalog);
-      
-    }  
-    else 
+
+    }
+    else
     {
       error = msg.getError();
       Serial.print("error: ");
