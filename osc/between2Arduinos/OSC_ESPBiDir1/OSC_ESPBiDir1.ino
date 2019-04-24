@@ -18,16 +18,6 @@
 #include <OSCBundle.h>
 #include <OSCData.h>
 
-#include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
-#include <avr/power.h>
-#endif
-
-#define NEO_PIN            25
-// How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      10
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
-
 
 char ssid[] = "anotherThing";          // your network SSID (name)
 char password[] = "connected";                    // your network password
@@ -52,7 +42,7 @@ unsigned int ledState = LOW;              // LOW means led is *on*
 #define BUILTIN_LED 13
 #endif
 #endif
-
+boolean ledValue = false;
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, ledState);    // turn *on* led
@@ -64,6 +54,7 @@ void setup() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
+
 
   int i = 0;
   int state = true;
@@ -97,33 +88,56 @@ void setup() {
 #else
   Serial.println(Udp.localPort());
 #endif
-  // initialize the neopixel library
-  pixels.begin();
+
+}
+
+
+void loop() {
+// toggle value to write
+  ledValue = !ledValue;
+
+  Serial.print("sending message /led ");
+  Serial.println(ledValue);
+  OSCMessage msgOut("/led");
+  if(ledValue){
+    msgOut.add(1);  
+  }else{
+    msgOut.add(0);
+  }
+  
+  Udp.beginPacket(outIp, outPort);
+  msgOut.send(Udp);
+  Udp.endPacket();
+  msgOut.empty();
+  delay(500);
+
+  OSCMessage msg;
+  int size = Udp.parsePacket();
+
+  if (size > 0) {
+    Serial.print("got stuff");
+    while (size--) {
+      msg.fill(Udp.read());
+    }
+    if (!msg.hasError())
+    {
+      // all possible OSC messages and handler functions
+      msg.dispatch("/led", led);
+      msg.dispatch("/test", test);
+      msg.dispatch("/analog", gotAnalog);
+
+    }
+    else
+    {
+      error = msg.getError();
+      Serial.print("error: ");
+      Serial.println(error);
+    }
+  }
 }
 
 void led(OSCMessage &msg) {
   ledState = msg.getInt(0);
-  if (ledState == 1) {
-    // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
-    for (int i = 0; i < NUMPIXELS; i++) {
-
-      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-      pixels.setPixelColor(i, pixels.Color(255, 255, 255));
-
-    }
-    pixels.show();
-  }else{
-    // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
-  for (int i = 0; i < NUMPIXELS; i++) {
-
-    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(0, 0, 0));
-
-  }
-  pixels.show();
-  }
-  
-  // also blink the on board LED
   digitalWrite(2, ledState); // GPIO 2 is built in LED on DOIT ESP32 board
   Serial.print("/led: ");
   Serial.println(ledState);
@@ -143,30 +157,4 @@ void gotAnalog(OSCMessage &msg) {
   int val = msg.getInt(0);
   Serial.print("/analog: ");
   Serial.println(val);
-}
-
-void loop() {
-  OSCMessage msg;
-  int size = Udp.parsePacket();
-
-  if (size > 0) {
-    //    Serial.print("stuff");
-    while (size--) {
-      msg.fill(Udp.read());
-    }
-    if (!msg.hasError())
-    {
-      // all possible OSC messages and handler functions
-      msg.dispatch("/led", led);
-      msg.dispatch("/test", test);
-      msg.dispatch("/analog", gotAnalog);
-
-    }
-    else
-    {
-      error = msg.getError();
-      Serial.print("error: ");
-      Serial.println(error);
-    }
-  }
 }
